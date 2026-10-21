@@ -1,5 +1,8 @@
+import os
+os.environ["MCP_ALLOWED_HOSTS"] = "keke-voice.onrender.com,localhost"
+
 from mcp.server.fastmcp import FastMCP
-import os, requests, base64
+import requests, base64
 
 mcp = FastMCP("keke-voice")
 API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
