@@ -32,6 +32,6 @@ def speak(text: str) -> str:
     return f"data:audio/mpeg;base64,{audio_b64}"
 
 if __name__ == "__main__":
-    mcp.run(transport="sse",
-            port=8080)
+    mcp.run()
+
 
