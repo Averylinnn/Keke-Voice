@@ -1,8 +1,10 @@
 import os
-os.environ["MCP_ALLOWED_HOSTS"] = "keke-voice.onrender.com,localhost"
+os.environ["MCP_ALLOWED_HOSTS"] = "*"
 
 from mcp.server.fastmcp import FastMCP
 import requests, base64
+from starlette.middleware import Middleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 mcp = FastMCP("keke-voice")
 API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
@@ -34,4 +36,9 @@ def speak(text: str) -> str:
     audio_b64 = base64.b64encode(resp.content).decode()
     return f"data:audio/mpeg;base64,{audio_b64}"
 
-app = mcp.sse_app()
+_app = mcp.sse_app()
+
+from starlette.applications import Starlette
+from starlette.routing import Mount
+
+app = Starlette(routes=[Mount("/", app=_app)])
