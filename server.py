@@ -3,7 +3,7 @@ import os, requests, base64
 
 mcp = FastMCP("keke-voice")
 API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
-VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID", "EWDSViiYlMWPTVeuCNzf")
+VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID", "RzwbtmqtU97ulT8Pclua")
 
 @mcp.tool()
 def speak(text: str) -> str:
@@ -31,7 +31,4 @@ def speak(text: str) -> str:
     audio_b64 = base64.b64encode(resp.content).decode()
     return f"data:audio/mpeg;base64,{audio_b64}"
 
-if __name__ == "__main__":
-    mcp.run()
-
-
+app = mcp.sse_app()
