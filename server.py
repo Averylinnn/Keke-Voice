@@ -1,6 +1,9 @@
 import os
 import requests
 import base64
+from starlette.applications import Starlette
+from starlette.routing import Route, Mount
+from starlette.responses import JSONResponse
 
 os.environ["MCP_ALLOWED_HOSTS"] = "*"
 
@@ -38,10 +41,18 @@ def speak(text: str) -> str:
 
 _sse_app = mcp.sse_app()
 
-async def app(scope, receive, send):
-    if scope["type"] == "http":
-        headers = dict(scope.get("headers", []))
-        new_headers = [(k, v) for k, v in scope["headers"] if k != b"host"]
-        new_headers.append((b"host", b"localhost"))
-        scope["headers"] = new_headers
-    await _sse_app(scope, receive, send)
+from starlette.types import ASGIApp, Receive, Scope, Send
+
+class HostFixMiddleware:
+    def __init__(self, app: ASGIApp):
+        self.app = app
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] == "http":
+            headers = list(scope.get("headers", []))
+            scope["headers"] = [
+                (b"host", b"localhost") if k == b"host" else (k, v)
+                for k, v in headers
+            ]
+        await self.app(scope, receive, send)
+
+app = HostFixMiddleware(_sse_app)
